@@ -18,20 +18,20 @@ export default function SearchBar({ onSearch, disabled }: SearchBarProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
-      <div className="flex gap-2">
+    <form onSubmit={handleSubmit}>
+      <div className="flex gap-3">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search for AI agents, LLMs, assistants, jarvis, friday..."
+          placeholder="Search repositories... AI agents, LLMs, frameworks, Jarvis, Friday"
           disabled={disabled}
-          className="flex-1 px-4 py-3 rounded-lg bg-slate-700 text-white placeholder-gray-400 border border-slate-600 focus:border-blue-500 focus:outline-none disabled:opacity-50"
+          className="flex-1 px-6 py-4 rounded-xl bg-gray-100 text-gray-900 placeholder-gray-500 border border-gray-200 focus:border-gray-300 focus:bg-white focus:outline-none transition-all disabled:opacity-50 font-light text-lg"
         />
         <button
           type="submit"
           disabled={disabled}
-          className="px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-8 py-4 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {disabled ? 'Searching...' : 'Search'}
         </button>
