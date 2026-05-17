@@ -4,6 +4,9 @@ import { agentRepos } from '@/lib/agentRepos';
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const query = (searchParams.get('q') || '').toLowerCase();
+  const category = searchParams.get('category');
+  const language = searchParams.get('language');
+  const minStars = searchParams.get('minStars') ? parseInt(searchParams.get('minStars')!) : null;
   const page = parseInt(searchParams.get('page') || '1');
   const perPage = 20;
 
@@ -16,7 +19,14 @@ export async function GET(request: NextRequest) {
       const matchTopics = repo.topics.some((topic) =>
         topic.toLowerCase().includes(query)
       );
-      return matchName || matchDescription || matchCategory || matchTopics;
+      const matchesSearch = matchName || matchDescription || matchCategory || matchTopics;
+
+      // Apply filters
+      const matchesCategory = !category || repo.category === category;
+      const matchesLanguage = !language || repo.language === language;
+      const matchesStars = !minStars || repo.stars >= minStars;
+
+      return matchesSearch && matchesCategory && matchesLanguage && matchesStars;
     });
 
     // Sort by stars

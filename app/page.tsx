@@ -4,6 +4,7 @@ import { useState } from 'react';
 import SearchBar from './components/SearchBar';
 import RepoCard from './components/RepoCard';
 import FeaturedRepos from './components/FeaturedRepos';
+import FilterBar from './components/FilterBar';
 
 interface Repo {
   id: number;
@@ -23,14 +24,29 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+  const [selectedStars, setSelectedStars] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+    setHasSearched(true);
+    performSearch(query, selectedCategory, selectedLanguage, selectedStars);
+  };
+
+  const performSearch = async (query: string, category: string | null, language: string | null, stars: number | null) => {
     setLoading(true);
     setError('');
-    setHasSearched(true);
 
     try {
-      const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+      const params = new URLSearchParams();
+      params.append('q', query);
+      if (category) params.append('category', category);
+      if (language) params.append('language', language);
+      if (stars) params.append('minStars', stars.toString());
+
+      const response = await fetch(`/api/search?${params.toString()}`);
       const data = await response.json();
 
       if (!response.ok) {
@@ -74,6 +90,27 @@ export default function Home() {
           <SearchBar onSearch={handleSearch} disabled={loading} />
         </div>
       </section>
+
+      {/* Filter Section */}
+      {hasSearched && (
+        <FilterBar
+          onCategoryChange={(cat) => {
+            setSelectedCategory(cat);
+            performSearch(searchQuery, cat, selectedLanguage, selectedStars);
+          }}
+          onLanguageChange={(lang) => {
+            setSelectedLanguage(lang);
+            performSearch(searchQuery, selectedCategory, lang, selectedStars);
+          }}
+          onStarsChange={(stars) => {
+            setSelectedStars(stars);
+            performSearch(searchQuery, selectedCategory, selectedLanguage, stars);
+          }}
+          selectedCategory={selectedCategory}
+          selectedLanguage={selectedLanguage}
+          selectedStars={selectedStars}
+        />
+      )}
 
       {/* Results/Featured Section */}
       <section className="px-6 pb-24">
